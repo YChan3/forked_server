@@ -22,7 +22,7 @@ int main() {
       printf("your input was %ld characters.\n", strlen(input));
     }
     else{
-      from_client = server_handshake( &to_client );
+      from_client = server_fork( &to_client );
     }
   }
 }
