@@ -13,5 +13,8 @@ int main() {
     fgets(input, BUFFER_SIZE, stdin);
     strtok(input, "\n");
     write(to_server, input, BUFFER_SIZE);
+
+    read(from_server, input, BUFFER_SIZE);
+    printf("Recieved %s\n", input);
   }
 }

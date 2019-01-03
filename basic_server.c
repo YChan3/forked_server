@@ -15,14 +15,15 @@ int main() {
   int from_client;
   char input[BUFFER_SIZE];
 
-  from_client = server_fork( &to_client );
-
   while(1){
-    if(read(from_client, input, BUFFER_SIZE)){
-      printf("your input was %ld characters.\n", strlen(input));
-    }
-    else{
-      from_client = server_fork( &to_client );
+    from_client = server_handshake( &to_client );
+
+    if(from_client){
+      while(read(from_client, input, BUFFER_SIZE)){
+        printf("Recieved %s\n", input);
+        sprintf(input, "your input was %ld characters", strlen(input));
+        write(to_client, input, strlen(input));
+      }
     }
   }
 }

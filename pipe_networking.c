@@ -34,7 +34,7 @@ char * SERVER_PIPE = "WKP";
 //   return client_server;
 // }
 
-int server_fork(int *to_client) {
+int server_handshake(int *to_client) {
   mkfifo(SERVER_PIPE,0666);
   printf("Server: Created server to client pipe\n");
   int client_server = open(SERVER_PIPE,O_RDONLY);
@@ -46,22 +46,38 @@ int server_fork(int *to_client) {
   remove(SERVER_PIPE);
   printf("Server: Removed server to pipe\n");
 
-  if(!fork()){
-    int server_client = open(pipe_name,O_WRONLY);
-    write(server_client,ACK,HANDSHAKE_BUFFER_SIZE);
-    printf("Server: sent %s to client\n",ACK);
+  int f = fork();
+  if(f) return 0;
 
-    char acknowledgement[HANDSHAKE_BUFFER_SIZE];
-    read(client_server, acknowledgement, HANDSHAKE_BUFFER_SIZE);
-    printf("Server: Recieved %s\n", acknowledgement);
+  int server_client = open(pipe_name,O_WRONLY);
+  write(server_client,ACK,HANDSHAKE_BUFFER_SIZE);
+  printf("Server: sent %s to client\n",ACK);
 
-    *to_client = server_client;
-    return client_server;
-  }
-  else{
-    close(client_server);
-  }
+  char acknowledgement[HANDSHAKE_BUFFER_SIZE];
+  read(client_server, acknowledgement, HANDSHAKE_BUFFER_SIZE);
+  printf("Server: Recieved %s\n", acknowledgement);
+
+  *to_client = server_client;
+  return client_server;
 }
+
+// int subserver_handshake(int *to_client){
+//   if(!fork()){
+//     int server_client = open(pipe_name,O_WRONLY);
+//     write(server_client,ACK,HANDSHAKE_BUFFER_SIZE);
+//     printf("Server: sent %s to client\n",ACK);
+//
+//     char acknowledgement[HANDSHAKE_BUFFER_SIZE];
+//     read(client_server, acknowledgement, HANDSHAKE_BUFFER_SIZE);
+//     printf("Server: Recieved %s\n", acknowledgement);
+//
+//     *to_client = server_client;
+//     return client_server;
+//   }
+//   else{
+//     close(client_server);
+//   }
+// }
 
 
 /*=========================
